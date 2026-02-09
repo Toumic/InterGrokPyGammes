@@ -167,7 +167,6 @@ def print_hi(base_intervalles):
     # lire en boucle le dictionnaire dic_sig contenant les degrés et les indices des signes
     # de chaque mode de gam_not[signe+note].
     dic_max = {}  # Dico{Max}.
-    # dic_retours = {}  # Dico{Retours}
     for k_sig in dic_sig.keys():
         lis_retours = []
         keys_max = [(k_sig, x) for x in range(1, 8)]  # Bâtir les clés modales
@@ -216,7 +215,7 @@ def print_hi(base_intervalles):
                     if dic_max[cdm][0][1] == fip and dic_max[cdm][0][-1] in rem_deg:
                         rem_deg.remove(dic_max[cdm][0][-1])
                         (lineno(), rem_deg)  # 155 [1, 2, 3, 4, 6, 7]
-                        (lineno(), "DM", dic_max[cdm])
+                        (lineno(), "DM", cdm, dic_max[cdm])  # cdm = ((1, 2, 2, 1, 2, 2, 2), 7)
                         # [([0, 1, 2, 2, 2, 1, 0], 2, [(1, 0), (2, -1), (3, -2), (4, -2), (5, 2), (6, 1), (7, 0)], 5)]
                         "# Maintenant, il faut savoir si ce choix est valable."
                         if dic_max[cdm][0][2][-1][1] == 0:  # La septième doit être majeure pour une gamme primordiale.
@@ -227,7 +226,7 @@ def print_hi(base_intervalles):
                                     gam_ton = [gt[1] for gt in gam_notes[(k_key[0], k_sig)][dm-1]]
                                     gam_gam[cdm] = gam_ton
                                     keys_cop.remove(cdm)
-                                    print(lineno(), "_0) GM", gam_notes[(k_key[0], k_sig)][dm-1])
+                                    print(lineno(), "_0) GM", gam_notes[(k_key[0], k_sig)][dm-1], "\ncdm", cdm)
                                     (lineno(), "_0) DR", dic_max[cdm][0])
                             elif fip in (1, 2, 3) and k_sig != (1, 2, 2, 1, 2, 2, 2):
                                 # Rechercher la gamme correspondante via notes_gam = gam_notes.keys()
@@ -236,7 +235,7 @@ def print_hi(base_intervalles):
                                     pont = retour, dic_max[cdm][0], (k_key[0], k_sig)
                                     lis_retours.append(pont)
                                     keys_cop.remove(cdm)
-                                    (lineno(), "_ GM", gam_notes[(k_key[0], k_sig)][cdm[1] - 1])
+                                    (lineno(), "_ GM", gam_notes[(k_key[0], k_sig)][cdm[1] - 1], "cdm", cdm)
                                     (lineno(), "_ dic_max", dic_max[cdm][0][2], "\nretour", retour)
                 ("# Traitement de la liste[lis_retours] par fin de cycle diatonique :"
                  "      Liste_retour[0] = Retour. [effets, forces]"
@@ -256,36 +255,103 @@ def print_hi(base_intervalles):
                         modes.append((flr[1][2], flr[1][3]))
                         clefs.append(flr[2])
                         if c_lis == long_rd:  # Afficher quand les listes sont complétées.
-                            print(lineno(), "effets", effets)
+                            print(lineno(), "EFFETS", effets)
                             ("Les effets incluent les automatismes altératifs, ceux qui"
                              "  annulent des importances pesantes des altérations.")
-                            print(lineno(), "forces", forces)
+                            print(lineno(), "FORCES", forces, "\t POIDS", poids)
                             ("Les forces sont produites par les fortes altérations."
                              "  Le nombre d'altéractions le moins fort est prioritaire.")
-                            print(lineno(), "poids", poids)
-                            "Les poids les plus légers sont prioritaires."
-                            print(lineno(), "modes", modes)
+                            (lineno(), "POIDS", poids)
+                            "Les poids les plus légers sont secondaires."
+                            (lineno(), "MODES", "modes")
                             "La représentation modale de la signature est nécessaire par conformité."
-                            print(lineno(), "clefs", clefs)
+                            (lineno(), "CLEFS", "clefs", "clefs=(k_key, k_sig)")
                             "# Partie du traitement conditionnel des évènements."
 
-                            "# Trouver de faibles forces définitives."
+                            "# Trouver de faibles forces définitives. Moins lourd = plus léger."
                             # Trouver le poids altératif minimal
                             mini_forces, count_fo = [], 0
                             gam_mini = None
                             for fo in forces:
-                                mfi = len(fo), count_fo
-                                mini_forces.append(mfi)  # Enregistrement des poids des forces.
+                                mfi = len(fo), count_fo  # Enregistrement des volumes des forces : len(fo).
+                                mini_forces.append(mfi)
                                 count_fo += 1
-                            mini_fo = min(o[0] for o in mini_forces)
-                            reso_fo = [o for o in mini_forces if mini_fo == o[0]]
-                            # Affecter un mode à cette mini-force.
-                            for rf in reso_fo:
-                                # Comparaison proportionnelle des effets.
-                                if not effets[rf[1]]:
-                                    print("\t***", lineno(), "effets", effets[rf[1]], "\n\t*** forces", forces[rf[1]])
+                                (lineno(), "FO", fo, "MFI", mfi)
+                            mini_fo = min(o[0] for o in mini_forces)  # Mesures de longueurs des forces.
+                            mini_lo = list(o[0] for o in mini_forces)  # Mesures de longueurs des forces.
+
+                            "# Boucle sélectionnant les plus faibles longueurs."
+                            (lineno(), "KG_alt", poids, "\tmini_fo_alt", mini_fo, "\tmini_lo_len", mini_lo)
+                            # 284 KG_alt [1, 1, 1] 	mini_fo_alt 1 	mini_lo_len [1, 3, 2]
+                            res_fo = []
+                            for et in mini_forces:
+                                if et[0] == mini_fo:  # Conditionne pour les petites longueurs.
+                                    res_fo.append(et)
+                                    (lineno(), "ET", et, "Kg", min(poids), "mini_fo", mini_fo)
+                            print(lineno(), "_ mini_forces", mini_forces, mini_fo, "\t res_fo", res_fo)
+                            # Affecter un mode à cette mini-force avec et sans effet.
+                            ("# On aurait pu se contenter de déclarer les plus petites des forces faibles."
+                             "Mais, il y aurait eu un vide descriptif tonal, ce qui a pour conséquence"
+                             "d'invisibiliser des notions importantes relatives aux tonalités."
+                             "POIDS ABSOLUS[pa] = les poids cumulés non signés."
+                             "POIDS GRAVITATIONNELS[pg] = les poids cumulés signés."
+                             "  po_tot_pa = poids total absolu (sans signature)."
+                             "  po_tot_pg = poids total signé (avec signature)."
+                             "  po_fort_pg = poids des forces signées."
+                             "  po_fort_pa = poids des forces absolues."
+                             "  po_eff_pg = poids des effets signés positifs."
+                             "  po_eff_pa = poids des effets signés négatifs."
+                             "POURQUOI PA & PG : la gravitation est en fait le flottement qu'a la gamme"
+                             "naturelle avec sons absence de signature. Disons alors que les mineures"
+                             "vont vers le négatif et que les augmentées vont vers le positifs,"
+                             "un accroissement des précisions géolocales.")
+                            po_tot_pa, po_tot_pg, po_fort_pg, po_fort_pa, po_eff_pg, po_eff_pa = 0, 0, 0, 0, 0, 0
+                            mf3, mf4 = None, None
+                            for rf in res_fo:
+                                # Comparaison proportionnelle en analysant les forces[len(res_fo)] et les effets.
+                                # Il faut travailler avec les modes
+                                print(lineno(), "RF", rf, "modes", modes[rf[1]][0])
+                                for pfp in forces[rf[1]]:
+                                    for mf in modes[rf[1]][0]:
+                                        (lineno(), modes[rf[1]][0])
+                                        mf1, mf2 = mf[0], mf[1]  # mf1 = degré et mf2 = altération
+                                        if int(pfp[-1]) == mf1:
+                                            if mf2 < 0:  # Modification du signe positif en négatif.
+                                                mf1 = mf1 - mf1 - mf1
+                                            mf3 = mf1 + mf2  # La somme du degré et de son altération
+                                            (lineno(), "mf1=deg", mf1, "mf2=alt", mf2, "mf3", mf3, "\tpfp", pfp)
+                                            # 319 mf1=deg -4 mf2=alt -2 mf3 -6 	pfp o4
+                                            # 319 mf1=deg 5 mf2=alt 2 mf3 7 	pfp x5
+                                    po_fort_pg += mf3
+                                    po_fort_pa += abs(mf3)
+                                    (lineno(), "pfp", pfp, "po_fort_pg", po_fort_pg, "\t po_fort_pa", po_fort_pa)
+                                for pep in effets[rf[1]]:
+                                    for mf in modes[rf[1]][0]:
+                                        mf1, mf2 = mf[0], mf[1]
+                                        if int(pep[-1]) == mf1:
+                                            if mf2 < 0:
+                                                mf1 = mf1 - mf1 - mf1
+                                            mf4 = mf1 + mf2
+                                            print(lineno(), "mf1=deg", mf1, "mf2=alt", mf2, "mf3", mf3, "\tpep", pep)
+                                            # 310 mfs -6 -1 mf3 -7 pfp -6
+                                    po_eff_pg += mf4
+                                    po_eff_pa += abs(mf4)
+                                    (lineno(), "pep", pep, "po_eff_pg", po_eff_pg, "\t po_eff_pa", po_eff_pa)
+                                # po_fort_pg, po_fort_pa =
+                                (lineno(), "RF", rf, forces[rf[1]], effets[rf[1]])
+                                '''if not effets[rf[1]] and clefs[rf[1]][0] in nbr_gam:
+                                    print("\t", lineno(), "effets", effets[rf[1]], "\n\tforces", forces[rf[1]], "_")
                                     gam_mini = modes[rf[1]]
-                            print(lineno(), "_\nmini_forces", mini_forces, "reso_fo", reso_fo, "gam_mini", gam_mini)
+                                    "gam_ton = [gt[1] for gt in gam_notes[(N°Gam, Modèle)][Degré]]"
+                                    (lineno(), "", gam_notes[clefs[rf[1]]], "modes", modes[rf[1]][-1])
+                                    deg, clef = modes[rf[1]][-1]-1, gam_notes[clefs[rf[1]]]
+                                    gam_ton = [gt[1] if gt[0] == 0 else f"{gt[0]}{gt[1]}" for gt in clef[deg]]
+                                    gam_gam[(k_sig, deg)] = gam_ton  # cdm = ((1, 2, 2, 1, 2, 2, 2), 7)
+                                    nbr_gam.remove(clefs[rf[1]][0])
+                                    print(lineno(), "gam_ton", gam_ton, clefs[rf[1]][0], modes[rf[1]][-1])'''
+                            print(lineno(), "po_fort_pg", po_fort_pg, "\t po_fort_pa", po_fort_pa)
+                            print(lineno(), "po_eff_pg", po_eff_pg, "\t po_eff_pa", po_eff_pa)
+                            print(lineno(), "gam_mini", gam_mini, k_key)
 
                     fin_for_fip = True
                     (lineno(), "lis_retours", lis_retours, "k_sig", k_sig, "Ajouter mode = dic_max[cdm][0][-1]")
@@ -294,7 +360,7 @@ def print_hi(base_intervalles):
             if fin_for_fip:  # for fip in fix_poids:
                 break
         # break  # for k_sig in dic_sig.keys(): Ne réalise qu'une boucle des modes diatoniques à la première gamme.
-    print(lineno(), "gam_gam", gam_gam)
+    print(lineno(), "gam_gam", len(gam_gam))
     (lineno(), gam_notes[(66, (1, 2, 2, 1, 2, 2, 2))])
 
 
