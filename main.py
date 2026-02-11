@@ -100,6 +100,16 @@ def print_hi(base_intervalles):
                 (lineno(), "lis_sig", lis_sig)
         # break
 
+    "# Construire un dictionnaire des forces altéractives."
+    alteractions = {
+        2: [["x2", "+3", "+4"], ["^2", "x3", "x4", "+5"], ["+^2", "^3", "^4", "x5", "+6"]],
+        3: [["+3", "+4"], ["x3", "x4", "+5"], ["^3", "^4", "x5", "+6"], ["o3", "-2"]],
+        4: [["x4", "+5"], ["^4", "x5", "+6"], ["o4", "o3", "-2"], ["-4", "-3"]],
+        5: [["x5", "+6"], ["o5", "-4", "-3"], ["*5", "o4", "o3", "-2"]],
+        6: [["o6", "-5"], ["*6", "o5", "-4", "-3"], ["-*6", "*5", "o4", "o3", "-2"]],
+        7: [["o7", "-6"], ["*7", "o6", "-5"], ["-*7", "*6", "o5", "-4", "-3"],
+            ["o*7", "-*6", "*5", "o4", "o3", "-2"]]}
+
     def func_gam(don):
         """Compte le nombre d'altérations des notes hors et en inclusions altéractives.
         Recevoir un tuple (degré, indice_altération), le coupler pour l'adapter au dictionnaire des altéractions.
@@ -107,15 +117,6 @@ def print_hi(base_intervalles):
         (lineno(), "Don", don)
         # 104 Don [(1, 0), (2, -1), (3, -2), (4, -2), (5, 2), (6, 1), (7, 0)]
         # sig_not = ["", "+", "x", "^", "+^", "x^", "o*", "-*", "*", "o", "-"]  # Les signes d'altération.
-        # Construire un dictionnaire des forces altéractives.
-        alteractions = {
-            2: [["x2", "+3", "+4"], ["^2", "x3", "x4", "+5"], ["+^2", "^3", "^4", "x5", "+6"]],
-            3: [["+3", "+4"], ["x3", "x4", "+5"], ["^3", "^4", "x5", "+6"], ["o3", "-2"]],
-            4: [["x4", "+5"], ["^4", "x5", "+6"], ["o4", "o3", "-2"], ["-4", "-3"]],
-            5: [["x5", "+6"], ["o5", "-4", "-3"], ["*5", "o4", "o3", "-2"]],
-            6: [["o6", "-5"], ["*6", "o5", "-4", "-3"], ["-*6", "*5", "o4", "o3", "-2"]],
-            7: [["o7", "-6"], ["*7", "o6", "-5"], ["-*7", "*6", "o5", "-4", "-3"],
-                ["o*7", "-*6", "*5", "o4", "o3", "-2"]]}
         "# Cycles des traitements : adaptations et formations."
         don_deg = [sig_not[d[1]] + str(d[0]) for d in don]  # Liste des degrés signés. Exemple : "x5"
         sig_liste, sec_liste = [], []  # Afin d'en retourner le résultat. De garder le résultat.
@@ -245,7 +246,7 @@ def print_hi(base_intervalles):
                 c_lis = 0
                 if not rem_deg:  # Break While long_fip
                     long_rd = len(lis_retours)
-                    print(lineno(), "long_rd", long_rd)
+                    (lineno(), "long_rd", long_rd)  # 248 long_rd 3
                     for flr in lis_retours:  # Cycle de la liste des retours.
                         c_lis += 1
                         (lineno(), "_0 ", flr[0], "\n", flr[1], "\n", flr[2])
@@ -281,13 +282,35 @@ def print_hi(base_intervalles):
                             mini_lo = list(o[0] for o in mini_forces)  # Mesures de longueurs des forces.
 
                             "# Boucle sélectionnant les plus faibles longueurs."
-                            (lineno(), "KG_alt", poids, "\tmini_fo_alt", mini_fo, "\tmini_lo_len", mini_lo)
+                            print(lineno(), "KG_alt", poids, "\tmini_fo_alt", mini_fo, "\tmini_lo_len", mini_lo)
                             # 284 KG_alt [1, 1, 1] 	mini_fo_alt 1 	mini_lo_len [1, 3, 2]
-                            res_fo = []
+                            res_fo, cfo = [], []
                             for et in mini_forces:
-                                if et[0] == mini_fo:  # Conditionne pour les petites longueurs.
-                                    res_fo.append(et)
-                                    (lineno(), "ET", et, "Kg", min(poids), "mini_fo", mini_fo)
+                                if et[0] == mini_fo:  # Petites longueurs.
+                                    (lineno(), "# if et[0]== mini_fo: Petites longueurs.", et[0])
+                                    if poids[et[1]] == min(poids):  # Petites altérations.
+                                        (lineno(), "## if poids[et[1]]== min(poids): Petites altérations.", et[0])
+                                        res_fo.append(et)
+                                        pfo = poids[et[1]]  # Prise de l'index de 'et'.
+                                        if pfo not in cfo:
+                                            cfo.append(pfo)
+                                        print(lineno(), "________ 0 et", et, "*** \t PCfo", pfo, cfo)
+                                    elif et[0] == min(mini_lo):  # Petites longueurs.
+                                        (lineno(), "## elif et[0]== min(mini_lo): Petites longueurs.", et[0])
+                                        pfo = poids[et[1]]  # Prise de l'index de 'et'.
+                                        if pfo == min(poids):
+                                            res_fo.append(et)
+                                            print(lineno(), "********* 1 ET", et, "*** \t PCfo", pfo, cfo)
+                                        elif not cfo:
+                                            res_fo.append(et)
+                                            cfo.append(pfo)
+                                            print(lineno(), "********* 2 ET", et, "*** \t PCfo", pfo, cfo)
+                                        elif cfo and pfo <= max(cfo):
+                                            res_fo.append(et)
+                                            if pfo not in cfo:
+                                                cfo.append(pfo)
+                                            print(lineno(), "********* 3 ET", et, "*** \t PCfo", pfo, cfo)
+                                (lineno(), "ET", et, "Kg", min(poids), "mini_fo", mini_fo)
                             print(lineno(), "_ mini_forces", mini_forces, mini_fo, "\t res_fo", res_fo)
                             # Affecter un mode à cette mini-force avec et sans effet.
                             ("# On aurait pu se contenter de déclarer les plus petites des forces faibles."
@@ -301,12 +324,12 @@ def print_hi(base_intervalles):
                              "  po_fort_pa = poids des forces absolues."
                              "  po_eff_pg = poids des effets signés positifs."
                              "  po_eff_pa = poids des effets signés négatifs."
-                             "POURQUOI PA & PG : la gravitation est en fait le flottement qu'a la gamme"
+                             "POURQUOI PA & PG : la gravitation flotte la gamme[niveau zéro naturel]"
                              "naturelle avec sons absence de signature. Disons alors que les mineures"
                              "vont vers le négatif et que les augmentées vont vers le positifs,"
                              "un accroissement des précisions géolocales.")
                             po_tot_pa, po_tot_pg, po_fort_pg, po_fort_pa, po_eff_pg, po_eff_pa = 0, 0, 0, 0, 0, 0
-                            mf3, mf4 = None, None
+                            mf3, mf4 = None, None  # mf3 stage FORCES _ mf4 stage EFFETS
                             for rf in res_fo:
                                 # Comparaison proportionnelle en analysant les forces[len(res_fo)] et les effets.
                                 # Il faut travailler avec les modes
