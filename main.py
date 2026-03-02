@@ -5,6 +5,7 @@
 
 import inspect
 from typing import Callable
+
 # lino() Pour consulter le programme grâce au suivi des print’s
 lineno: Callable[[], int] = lambda: inspect.currentframe().f_back.f_lineno
 
@@ -56,7 +57,7 @@ def print_hi(base_intervalles):
                 cum_g += mod_rang[y]  # Ajoute la valeur de l'intervalle modal.
                 res_mg = cum_g - cum_m  # Calcule la différence pour obtenir le signe d'altération.
                 sig_mg = sig_not[res_mg]  # Sélection du signe dans la liste des altérations sig_not.
-                res_sig = sig_mg, not_mus[y+1]  # Couple du signe et de la note.
+                res_sig = sig_mg, not_mus[y + 1]  # Couple du signe et de la note.
                 im.append(res_sig)
                 y += 1
                 if len(im) == 7:
@@ -165,7 +166,6 @@ def print_hi(base_intervalles):
         # 158 sig_liste ['o3', '-2', 'o4', 'x5', '+6'] sec_liste ['o4', 'x5'] hors_liste [] 3
         return "Effets", sig_liste, "Forces", sec_liste
 
-
     "# Traitement pour déterminer les gammes."
     "# Quelle règle utiliser pour choisir les gammes ?"
     "La grande majorité des gammes fondamentales n'excèdent pas les doubles altérations (bb, ##)."
@@ -230,11 +230,11 @@ def print_hi(base_intervalles):
                                 # Rechercher la gamme correspondante via notes_gam = gam_notes.keys()
                                 if k_sig in cdm and cdm in keys_cop:
                                     dm = dic_max[cdm][0][-1]
-                                    gam_ton = [gt[1] for gt in gam_notes[(k_key[0], k_sig)][dm-1]]
+                                    gam_ton = [gt[1] for gt in gam_notes[(k_key[0], k_sig)][dm - 1]]
                                     gam_ton.append('Maj')
-                                    gam_gam[dic_rang[k_key[0]][6]] = gam_ton
+                                    gam_gam[(dic_rang[k_key[0]][6], k_key[0])] = gam_ton
                                     keys_cop.remove(cdm)
-                                    (lineno(), "_0) GM", gam_notes[(k_key[0], k_sig)][dm-1], "\ncdm", cdm)
+                                    (lineno(), "_0) GM", gam_notes[(k_key[0], k_sig)][dm - 1], "\ncdm", cdm)
                                     (lineno(), "_0) DR", dic_max[cdm][0])
                             elif fip in (1, 2, 3) and k_sig != (1, 2, 2, 1, 2, 2, 2):
                                 # Rechercher la gamme correspondante via notes_gam = gam_notes.keys()
@@ -405,18 +405,18 @@ def print_hi(base_intervalles):
                     len_dgk = len(cop_dgk)
                     tags = [i for i, x in enumerate(cop_dgk) if len(x) == 3]  # Tags = couple fort.
                     # dic_tag = {tag: [] for tag in tags}
-                    dt0 = {}  # DT0 = dico[tags].
                     not_mus, nom = ["C", "D", "E", "F", "G", "A", "B"], ""  # Les notes naturelles et le nom.
                     if k_key[0] != 66:  # Capacité en len(dgk) = 5 pour le premier len(dgk) = 3
                         # gam_in = []  # Liste les notes de la gamme sélectionnée.
                         if len(tags) == 1:  # Lorsqu'il n'y a qu'une seule gamme.
+                            gam_in = []
                             for t1 in range(len_dgk):
                                 dg1 = cop_dgk[t1]
                                 if t1 == tags[0]:
-                                    dt0[tags[0]] = [dg1]
+                                    # dt0[tags[0]] = [dg1]
                                     if len(cop_dgk) <= 3:  # Capte gamme et son nom + sans EFF_PG
                                         gam_in = [(x if isinstance(x, str) else '') + y for x, y in dg1[1]]
-                                        print(lineno(), "gam_in", gam_in)
+                                        (lineno(), "gam_in", gam_in)
                                         "# À partir des noms alphas, créer des noms numériques. '-E' devient '-3'."
                                         ty = []  # Traiter l'affichage des noms
                                         for tx in gam_in:
@@ -434,26 +434,28 @@ def print_hi(base_intervalles):
                                                 ty[1] = ty[1].replace(ty[1][1], '')
                                                 nom = ''.join(str(y) for y in ty)
                                                 gam_in.append(nom)
-                                                print(lineno(), "if(-==-) TOY", toy, "nom", nom)
+                                                (lineno(), "if(-==-) TOY", toy, "nom", nom)
                                             else:
                                                 nom = ''.join(str(y) for y in ty)
                                                 gam_in.append(nom)
-                                                print(lineno(), "el(-!=-) TOY", toy, "nom", nom)
+                                                (lineno(), "el(-!=-) TOY", toy, "nom", nom)
                                         else:  # La gamme a une seule note altérée
                                             nom = ''.join(str(y) for y in ty)
                                             gam_in.append(nom)
-                                            print(lineno(), "if(ty==1) TY", ty, "nom", nom)
+                                            (lineno(), "if(ty==1) TY", ty, "nom", nom)
+                                        gam_gam[(dg1[2], k_key[0])] = gam_in
                                     elif len(cop_dgk) >= 4:  # Gamme[59] (-4)(x4)(o6)(o3)
                                         gam_in = [(x if isinstance(x, str) else '') + y for x, y in dg1[1]]
-                                        print(lineno(), "gam_in", gam_in)
+                                        (lineno(), "gam_in", gam_in)
                                         ty, t_alt, t_tot = [], [], []
                                         for t4 in range(tags[0] + 1, len_dgk):
                                             ("# En même temps tester si la gamme n'a pas de redondance."
                                              "Donnée forte, donnée faible = les notes parues, les notes cachées.")
+                                            (lineno(), "T4", t4, cop_dgk[t4])
                                             if "FOR_PG" in cop_dgk[t4][4]:  # Donnée forte du résultat.
                                                 ty.append(cop_dgk[t4][4][0])
                                                 t_tot.append(cop_dgk[t4][4][0])
-                                            if cop_dgk[t4][4][0] not in ty:  # Donnée faible du produit.
+                                            if cop_dgk[t4][4][0] not in ty:  # Donnée faible produite.
                                                 t_alt.append(cop_dgk[t4][4][0])
                                                 t_tot.append(cop_dgk[t4][4][0])
                                         ox, ind_ox = [oy[1] for oy in t_tot], -1
@@ -491,13 +493,13 @@ def print_hi(base_intervalles):
                                         if fen:
                                             # sig_not = ["", "+", "x", "^", "+^", "x^", "o*", "-*", "*", "o", "-"]
                                             n_for = [n for n in dg1[0] if n[0] == int(fen[0][-1])]  # Donnée forte
-                                            sig = sig_not.index(fen[1][0])  # Index du signe courant.
-                                            if sig < 6:  # L'index est dans l'espace augmenté.
-                                                n_eff = sig
-                                                (lineno(), "sig>5", sig)
+                                            sig2 = sig_not.index(fen[1][0])  # Index du signe courant.
+                                            if sig2 < 6:  # L'index est dans l'espace augmenté.
+                                                n_eff = sig2
+                                                (lineno(), "sig2>5", sig2)
                                             else:  # L'index est dans l'espace diminué.
-                                                n_eff = sig - len(sig_not)
-                                                (lineno(), "sig", sig)
+                                                n_eff = sig2 - len(sig_not)
+                                                (lineno(), "sig2", sig2)
                                             n_res = n_for[0][1] - n_eff
                                             n_not, cc = sig_not[n_res] + fen[0][1], 0
                                             for xy in ty:
@@ -510,7 +512,6 @@ def print_hi(base_intervalles):
                                             # 489 ty ['o4', 'o5'] fen ['o4', '-4']
                                             # dg1 [(1, 0), (2, -1), (3, -2), (4, -2), (5, -2), (6, 0), (7, 0)]
 
-
                                         if len(ty) > 1:
                                             toy = ty.copy()
                                             ty[1] = ty[1][::-1]  # Changement de position de l'altération
@@ -518,57 +519,285 @@ def print_hi(base_intervalles):
                                                 ty[1] = ty[1].replace(ty[1][1], '')
                                                 nom = ''.join(str(y) for y in ty)
                                                 gam_in.append(nom)
-                                                print(lineno(), "if(-==-) TOY", toy, "nom", nom)
+                                                (lineno(), "if(-==-) TOY", toy, "nom", nom)
                                             else:
                                                 nom = ''.join(str(y) for y in ty)
                                                 gam_in.append(nom)
-                                                print(lineno(), "el(-!=-) TOY", toy, "nom", nom)
+                                                (lineno(), "el(-!=-) TOY", toy, "nom", nom)
                                         else:  # La gamme a une seule note altérée
                                             nom = ''.join(str(y) for y in ty)
                                             gam_in.append(nom)
-                                            print(lineno(), "if(ty==1) TY", ty, "nom", nom)
+                                            (lineno(), "if(ty==1) TY", ty, "nom", nom)
                                         (lineno(), "cop_dgk=4_dg1", dg1[1], "len()", len(cop_dgk))
-                                        gam_gam[dg1[2]] = gam_in
+                                        gam_gam[(dg1[2], k_key[0])] = gam_in
                                         (lineno(), "cop_dgk>=4", dg1[1], "len(cop_dgk)", len(cop_dgk))
                                 (lineno(), "t1", t1, "*G __ \t\t dg1", dg1, "len(cop_dgk)", len(cop_dgk))
+                            print(lineno(), "gam_in", gam_in)
                         elif len(tags) == 2:  # Lorsqu'il y a deux gammes.
+                            tag1, tag2, ok_tag, dgx, gam_in = tags[1] - 1, len(cop_dgk) - (tags[1] + 1), None, [], []
+                            min_t, mi1, mi2, tag_x = [], 0, 0, []  # Départager les infériorités
+                            quel_tag = ""  # Décision du tri pour une affectation d'écriture.
+                            (lineno(), "tag1&2", tag1, tag2, "len(cop_dgk)", len(cop_dgk))
+                            "# Recherche des poids enregistrés, pour la section : inf ou iso à 3."
+                            if tag1 <= 3 and tag2 <= 3:  # Quand les deux sont inf ou iso à 3.
+                                for t10 in range(tags[0] + 1, tags[1]):
+                                    dg10 = cop_dgk[t10]
+                                    mi1 += abs(dg10[3])  # Poids absolu
+                                    (lineno(), "tag1&2<=3_10", tag1, tag2, dg10[3], "mi1", mi1)
+                                for t20 in range(tags[1] + 1, len_dgk):
+                                    dg20 = cop_dgk[t20]
+                                    mi2 += abs(dg20[3])  # Poids absolu
+                                    (lineno(), "tag1&2<=3_20", tag1, tag2, dg20[3], "mi2", mi2)
+                                min_t = min(mi1, mi2)
+                                if min_t == mi1:
+                                    tag1 = tag1
+                                    tag2 = 0
+                                else:
+                                    tag1 = 0
+                                    tag2 = tag2
+                                (lineno(), "mi1&2<=3", mi1, mi2, "min_t", min_t)
+                            if tag1 <= 3 or tag2 <= 3:
+                                if 0 < tag1 <= 3:
+                                    ok_tag = 1
+                                    quel_tag = "<=3"
+                                    (lineno(), "** IF tag1", tag1)
+                                if 0 < tag2 <= 3:
+                                    ok_tag = 2
+                                    quel_tag = "<=3"
+                                    (lineno(), "** EL tag2", tag2)
+
+                            "# Recherche des poids enregistrés, pour la section : sup à 3."
+                            if tag1 > 3 and tag2 > 3:  # Quand les deux sont inf ou iso à 3.
+                                for t10 in range(tags[0] + 1, tags[1]):
+                                    dg10 = cop_dgk[t10]
+                                    mi1 += abs(dg10[3])  # Poids absolu
+                                    (lineno(), "tag1&2<=3_10", tag1, tag2, dg10[3], "mi1", mi1, dg10)
+                                for t20 in range(tags[1] + 1, len_dgk):
+                                    dg20 = cop_dgk[t20]
+                                    mi2 += abs(dg20[3])  # Poids absolu
+                                    (lineno(), "tag1&2<=3_20", tag1, tag2, dg20[3], "mi2", mi2, dg20)
+                                min_t = min(mi1, mi2)
+                                if min_t == mi1:
+                                    ok_tag = 1
+                                    quel_tag = ">3"
+                                    tag_x = tags[0]
+                                else:
+                                    ok_tag = 2
+                                    quel_tag = ">3"
+                                    tag_x = tags[1]
+                                (lineno(), "mi1&2>3", mi1, mi2, "min_t", min_t)
+
                             for t1 in range(tags[0], tags[1]):
                                 dg1 = cop_dgk[t1]
-                                if t1 == tags[0]:
-                                    dt0[tags[0]] = [dg1]
-                                else:
-                                    dt0[tags[0]].append(dg1)
-                                print(lineno(), "t1", t1, "*G __ \t\t dg2", dg1)
+                                if t1 == tags[0] and ok_tag == 1:
+                                    dgx = dg1
+                                    (lineno(), "t1", t1, "*G __ \t\t dg2", dg1[1])
                             for t2 in range(tags[1], len_dgk):
                                 dg2 = cop_dgk[t2]
-                                if t2 == tags[1]:
-                                    dt0[tags[1]] = [dg2]
-                                else:
-                                    dt0[tags[1]].append(dg2)
-                                print(lineno(), "t2", t2, "*G __ \t\t dg2", dg2[1])
-                        elif len(tags) == 3:  # Lorsqu'il y a deux gammes.
-                            for t1 in range(tags[0], tags[1]):
-                                dg1 = cop_dgk[t1]
-                                if t1 == tags[0]:
-                                    dt0[tags[0]] = [dg1]
-                                else:
-                                    dt0[tags[0]].append(dg1)
-                                print(lineno(), "t1", t1, "*G __ \t\t dg2", dg1)
-                            for t2 in range(tags[1], tags[2]):
-                                dg2 = cop_dgk[t2]
-                                if t2 == tags[1]:
-                                    dt0[tags[1]] = [dg2]
-                                else:
-                                    dt0[tags[1]].append(dg2)
-                                print(lineno(), "t2", t2, "*G __ \t\t dg2", dg2)
-                            for t3 in range(tags[2], len_dgk):
-                                dg3 = cop_dgk[t3]
-                                if t3 == tags[2]:
-                                    dt0[tags[2]] = [dg3]
-                                else:
-                                    dt0[tags[2]].append(dg3)
-                                print(lineno(), "t3", t3, "*G __ \t\t dg3", dg3)
+                                if t2 == tags[1] and ok_tag == 2:
+                                    dgx = dg2
+                                    (lineno(), "t2", t2, "*G __ \t\t dg2", dg2[1])
 
+                            if quel_tag == "<=3":
+                                if ok_tag:
+                                    gam_in = [(x if isinstance(x, str) else '') + y for x, y in dgx[1]]
+                                    (lineno(), "gam_in", gam_in)
+                                    "# À partir des noms alphas, créer des noms numériques. '-E' devient '-3'."
+                                    ty = []  # Traiter l'affichage des noms
+                                    for tx in gam_in:
+                                        if len(tx) > 1:
+                                            xx = list(tx)
+                                            ind_ax = not_mus.index(xx[-1]) + 1
+                                            xx[1] = str(ind_ax)
+                                            xx = ''.join(str(y) for y in xx)
+                                            ty.append(str(xx))
+                                            (lineno(), "TX", tx, "XX", xx, "ind_ax", ind_ax)
+
+                                    if len(ty) > 1:
+                                        toy = ty.copy()
+                                        ty[1] = ty[1][::-1]  # Changement de position de l'altération
+                                        if ty[0][0] == ty[1][1]:
+                                            ty[1] = ty[1].replace(ty[1][1], '')
+                                            nom = ''.join(str(y) for y in ty)
+                                            gam_in.append(nom)
+                                            (lineno(), "if(-==-) TOY", toy, "nom", nom)
+                                        else:
+                                            nom = ''.join(str(y) for y in ty)
+                                            gam_in.append(nom)
+                                            (lineno(), "el(-!=-) TOY", toy, "nom", nom)
+                                    else:  # La gamme a une seule note altérée
+                                        nom = ''.join(str(y) for y in ty)
+                                        gam_in.append(nom)
+                                gam_gam[(dgx[2], k_key[0])] = gam_in
+                                (lineno(), "gam_in", gam_in)
+                            elif quel_tag == ">3":
+                                gam_in = [(x if isinstance(x, str) else '') + y for x, y in dgx[1]]
+                                (lineno(), "gam_in", gam_in)
+                                ty, t_alt, t_tot = [], [], []
+                                for t4 in range(tag_x + 1, len_dgk):
+                                    if len(cop_dgk[t4]) == 3:  # Fin de la section, car len(cop_dgk[t4] = tag suivant.
+                                        break  # Placé au début empêche l'erreur de lecture de cop_dgk[t4][4]
+                                    if len(cop_dgk[t4]) == 5:
+                                        ("# En même temps tester si la gamme n'a pas de redondance."
+                                         "Donnée forte, donnée faible = les notes parues, les notes cachées.")
+                                        (lineno(), "T4", t4, cop_dgk[t4], len(cop_dgk[t4]), type(cop_dgk[t4]))
+                                        if "FOR_PG" in cop_dgk[t4][4]:  # Donnée forte du résultat.
+                                            ty.append(cop_dgk[t4][4][0])
+                                            t_tot.append(cop_dgk[t4][4][0])
+                                        if cop_dgk[t4][4][0] not in ty:  # Donnée faible produite.
+                                            t_alt.append(cop_dgk[t4][4][0])
+                                            t_tot.append(cop_dgk[t4][4][0])
+
+                                ox, ind_ox = [oy[1] for oy in t_tot], -1
+                                (lineno(), "**TY", ty, "** OX", ox)
+                                # 460 **TY ['o4', 'o5'] ** OX ['4', '5', '3', '2', '4', '3']
+                                fen = []  # Fen[0] = Forte et fen[1] = Effet
+                                for o in ox:
+                                    ind_ox += 1  # Devient l'indice de 'o' dans 'ox'
+                                    # fen = []  # Fen[0] = Forte et fen[1] = Effet
+                                    if ox.count(o) > 1:  # Il y a un phénomène altéractif.
+                                        ("# Chercher l'élément 'o' parmi les altéractions."
+                                         "Si 'o' est dans fort[TY] = note réelle."
+                                         "Si 'o' est un effet[T_ALT]  = note altéractivée."
+                                         "Les gammes concernées : 41, 24, 22, 9, 8."
+                                         "La gamme[9] est particulière :"
+                                         "  480 if(-==-) TY ['o4', '5o'] nom o45o"
+                                         "  471 ** t_tot ['o4', 'o5', 'o3', '-2', '-4', '-3'] "
+                                         "  OX ['4', '5', '3', '2', '4', '3'] O 3 fen ['o4', '-4', 'o3', '-3']")
+                                        vi, vii = alteractions[int(o)], ind_ox
+                                        (lineno(), "VI", vi)  # Données du dico altéractions.
+                                        # [['x4', '+5'], ['^4', 'x5', '+6'], ['o4', 'o3', '-2'], ['-4', '-3']]
+                                        for u in vi:
+                                            for a in u:  # U = ['o4', 'o3', '-2']
+                                                if a in ty and t_tot[vii] not in fen:  # Donnée forte.
+                                                    fen.append(t_tot[vii])
+                                                    (lineno(), "t_tot", t_tot[vii], "TY", ty, "fen", fen)
+                                                    # 482 t_tot o4 TY ['o4', 'o5'] fen ['o4']
+                                                    for ta in t_alt:  # Donnée faible.
+                                                        if ta[-1] == o and ta not in fen:
+                                                            fen.append(ta)
+                                                            (lineno(), "TA", ta, "O", o, "fen", fen)
+                                                            # 487 TA -4 O 4 fen ['o4', '-4']
+
+                                "# Construire 'ty' selon 'fen'."
+                                if fen:
+                                    # sig_not = ["", "+", "x", "^", "+^", "x^", "o*", "-*", "*", "o", "-"]
+                                    n_for = [n for n in dgx[0] if n[0] == int(fen[0][-1])]  # Donnée forte
+                                    sig2 = sig_not.index(fen[1][0])  # Index du signe courant.
+                                    if sig2 < 6:  # L'index est dans l'espace augmenté.
+                                        n_eff = sig2
+                                        (lineno(), "sig2>5", sig2)
+                                    else:  # L'index est dans l'espace diminué.
+                                        n_eff = sig2 - len(sig_not)
+                                        (lineno(), "sig2", sig2)
+                                    n_res = n_for[0][1] - n_eff
+                                    n_not, cc = sig_not[n_res] + fen[0][1], 0
+                                    for xy in ty:
+                                        if xy[-1] == fen[0][1]:
+                                            ty[cc] = n_not
+                                        cc += 1
+                                    (lineno(), "f", n_for[0][1], "e", n_eff, "r", n_res, "n", n_not)
+                                    (lineno(), "ty", ty, "fen", fen, "dgx", dgx[0])
+                                    # 503 f -2 e -1 r -1 n -4
+                                    # 489 ty ['o4', 'o5'] fen ['o4', '-4']
+                                    # dg1 [(1, 0), (2, -1), (3, -2), (4, -2), (5, -2), (6, 0), (7, 0)]
+
+                                if len(ty) > 1:
+                                    toy = ty.copy()
+                                    ty[1] = ty[1][::-1]  # Changement de position de l'altération
+                                    if ty[0][0] == ty[1][1]:
+                                        ty[1] = ty[1].replace(ty[1][1], '')
+                                        nom = ''.join(str(y) for y in ty)
+                                        gam_in.append(nom)
+                                        (lineno(), "if(-==-) TOY", toy, "nom", nom)
+                                    else:
+                                        nom = ''.join(str(y) for y in ty)
+                                        gam_in.append(nom)
+                                        (lineno(), "el(-!=-) TOY", toy, "nom", nom)
+                                else:  # La gamme a une seule note altérée
+                                    nom = ''.join(str(y) for y in ty)
+                                    gam_in.append(nom)
+                                    (lineno(), "if(ty==1) TY", ty, "nom", nom)
+                                (lineno(), "cop_dgk=4_dgx", dgx[1], "len()", len(cop_dgk))
+                                gam_gam[(dgx[2], k_key[0])] = gam_in
+                                (lineno(), "cop_dgk>=4", dgx[1], "len(cop_dgk)", len(cop_dgk))
+                            (lineno(), "*G __ \t\t dgx", dgx, "len(cop_dgk)", len(cop_dgk))
+                            print(lineno(), "gam_in", gam_in)
+                        elif len(tags) == 3:  # Lorsqu'il y a trois gammes.
+                            tag1, tag2, tag3 = tags[1] - 1, (tags[2] - 1) - tags[1], len(cop_dgk) - (tags[2] + 1)
+                            pa1, pa2, pa3, pax = 0, 0, 0, []  # Cumuls des poids absolus par tranche.
+                            eff1, eff2, eff3 = 0, 0, 0  # Obtenir les longueurs des listes des effets.
+                            dg1, dg2, dg3, dgx = None, None, None, []
+                            gam_in, tyx = [], {1: [], 2: [], 3: []}
+                            "# Cycles originaux des mémorisations."
+                            for t1 in range(tags[0], tags[1]):  # Première tranche.
+                                dg1 = cop_dgk[t1]
+                                if t1 != tags[0]:
+                                    eff1 += 1  # Cumul des longueurs des listes.
+                                    pa1 += abs(dg1[3])  # Cumul des poids absolus des listes.
+                                    if "FOR_PG" in dg1[4]:  # Donnée forte du résultat.
+                                        tyx[1].append(dg1[4][0])
+                                        (lineno(), "*G \t dg1", dg1, "ty", ty)
+                                    (lineno(), "t1", t1, "*G \t dg1", dg1, "PA1", pa1)
+                            for t2 in range(tags[1], tags[2]):  # Deuxième tranche.
+                                dg2 = cop_dgk[t2]
+                                if t2 != tags[1]:
+                                    eff2 += 1  # Cumul des longueurs des listes.
+                                    pa2 += abs(dg2[3])  # Cumul des poids absolus des listes.
+                                    if "FOR_PG" in dg2[4]:  # Donnée forte du résultat.
+                                        tyx[2].append(dg2[4][0])
+                                        (lineno(), "*G \t\t\t dg2", dg2[4][0], "ty", ty)
+                                    (lineno(), "t2", t2, "*G \t\t\t dg2", dg2, "PA2", pa2)
+                            for t3 in range(tags[2], len_dgk):  # Troisième tranche.
+                                dg3 = cop_dgk[t3]
+                                if t3 != tags[2]:
+                                    eff3 += 1  # Cumul des longueurs des listes.
+                                    pa3 += abs(dg3[3])  # Cumul des poids absolus des listes.
+                                    if "FOR_PG" in dg3[4]:  # Donnée forte du résultat.
+                                        tyx[3].append(dg3[4][0])
+                                        (lineno(), "*G \t dg3", dg3, "ty", ty)
+                                    (lineno(), "t3", t3, "*G \t dg3", dg3, "PA3", pa3)
+                            (lineno(), "\nGamme numéro =", k_key, "\t\ttag1_2_3 =", tag1, tag2, tag3)
+                            "# Les poids faibles absolus, les longueurs des listes et les secteurs diatoniques."
+                            pax, tgx, dgx = [pa1, pa2, pa3], [eff1, eff2, eff3], [dg1, dg2, dg3]
+                            min_poids, min_len = min(pa1, pa2, pa3), min(eff1, eff2, eff3)
+                            (lineno(), "min_poids", min_poids, "\tpax", pax, "\tmin_len", min_len, "\ttgx", tgx)
+                            "# Conclusions des poids et des longueurs."
+                            nbr_min_pa, ind_p = pax.count(min_poids), -1
+                            ind_eff, ty = tgx.index(min_len), []
+                            if nbr_min_pa > 1:
+                                for mp in pax:  # Liste les poids absolus de chacune des gammes en cours.
+                                    if mp == min_poids:
+                                        ind_p += 1  # Positionnement du poids minimum dans la liste des poids 'pax'
+                                        "# Absence de doublon dans la liste des longueurs de : elif len(tags) == 3."
+                                        if ind_p == ind_eff:  # L'indice est égal à la longueur minimale 'tgx'
+                                            if ind_p == 0:
+                                                dgx = cop_dgk[tags[0]]
+                                                ty = tyx[1]
+                                                gam_in = [(x if isinstance(x, str) else '') + y for x, y in dgx[1]]
+                                            elif ind_p == 1:
+                                                dgx = cop_dgk[tags[1]]
+                                                ty = tyx[2]
+                                                gam_in = [(x if isinstance(x, str) else '') + y for x, y in dgx[1]]
+                                            elif ind_p == 2:
+                                                dgx = cop_dgk[tags[2]]
+                                                ty = tyx[3]
+                                                gam_in = [(x if isinstance(x, str) else '') + y for x, y in dgx[1]]
+                            (lineno(), "TY", ty)
+                            if len(ty) > 1:
+                                toy = ty.copy()
+                                ty[1] = ty[1][::-1]  # Changement de position de l'altération
+                                if ty[0][0] == ty[1][1]:
+                                    ty[1] = ty[1].replace(ty[1][1], '')
+                                    nom = ''.join(str(y) for y in ty)
+                                    gam_in.append(nom)
+                                    print(lineno(), "if(-==-) TOY", toy, "nom", nom)
+                                else:
+                                    nom = ''.join(str(y) for y in ty)
+                                    gam_in.append(nom)
+                                    (lineno(), "el(-!=-) TOY", toy, "nom", nom)
+                            print(lineno(), "gam_in", gam_in)
+                            gam_gam[(dgx[2], k_key[0])] = gam_in
                     print(lineno(), "tags", tags)
 
                     fin_for_fip = True
@@ -580,6 +809,10 @@ def print_hi(base_intervalles):
         # break  # for k_sig in dic_sig.keys(): Ne réalise qu'une boucle des modes diatoniques à la première gamme.
     (lineno(), "gam_gam", len(gam_gam), "dic_rang[66] =", dic_rang[66][6])  # K_sig diatoniques)
     print(lineno(), gam_gam, "Nombre de gammes solutionnées :", len(gam_gam.keys()))
+    k_nbr = 0
+    for kg in gam_gam.keys():
+        k_nbr += 1
+        (lineno(), kg, k_nbr)
 
 
 # Presser le triangle vert pour exécuter le script.
@@ -594,7 +827,7 @@ if __name__ == '__main__':
         25: (1, 1, 1, 2, 4, 1, 2), 26: (1, 1, 1, 3, 1, 1, 4), 27: (1, 1, 1, 3, 1, 2, 3), 28: (1, 1, 1, 3, 1, 3, 2),
         29: (1, 1, 1, 3, 2, 1, 3), 30: (1, 1, 1, 3, 2, 2, 2), 31: (1, 1, 1, 3, 3, 1, 2), 32: (1, 1, 1, 4, 1, 1, 3),
         33: (1, 1, 1, 4, 1, 2, 2), 34: (1, 1, 1, 4, 2, 1, 2), 35: (1, 1, 1, 5, 1, 1, 2), 36: (1, 1, 2, 1, 1, 2, 4),
-        37: (1, 1, 2, 1, 1, 3, 3), 38: (1, 1, 2, 1, 1, 4, 2), 39: (1, 1, 2, 1, 2, 1, 4),  40: (1, 1, 2, 1, 2, 2, 3),
+        37: (1, 1, 2, 1, 1, 3, 3), 38: (1, 1, 2, 1, 1, 4, 2), 39: (1, 1, 2, 1, 2, 1, 4), 40: (1, 1, 2, 1, 2, 2, 3),
         41: (1, 1, 2, 1, 2, 3, 2), 42: (1, 1, 2, 1, 3, 1, 3), 43: (1, 1, 2, 1, 3, 2, 2), 44: (1, 1, 2, 1, 4, 1, 2),
         45: (1, 1, 2, 2, 1, 1, 4), 46: (1, 1, 2, 2, 1, 2, 3), 47: (1, 1, 2, 2, 1, 3, 2), 48: (1, 1, 2, 2, 2, 1, 3),
         49: (1, 1, 2, 2, 2, 2, 2), 50: (1, 1, 2, 2, 3, 1, 2), 51: (1, 1, 2, 3, 1, 1, 3), 52: (1, 1, 2, 3, 1, 2, 2),
